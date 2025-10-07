@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego — {{ number }}</title>
+  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}">
+  <script>
+    async function checkDigit() {
+      const number = "{{ number }}";
+      const position = "{{ position }}";
+      const guess = document.getElementById("guess").value.trim();
+
+      const res = await fetch(`/check/?number=${number}&position=${position}&guess=${guess}`);
+      const data = await res.json();
+
+      const resultBox = document.getElementById("result");
+      if (data.correct) {
+        resultBox.textContent = "✅ Correcto!";
+        resultBox.className = "result ok";
+      } else {
+        resultBox.textContent = `❌ Incorrecto (era ${data.expected})`;
+        resultBox.className = "result ko";
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="wrapper">
+    <a href="{% url 'index' %}" class="link">← Volver</a>
+    <h2>Estás jugando con {{ number|title }}</h2>
+
+    <!-- NUEVO: selector de rango -->
+    <form method="get" class="range-form">
+      <label>Desde:
+        <input type="number" name="min" value="{{ min_pos }}" min="1">
+      </label>
+      <label>Hasta:
+        <input type="number" name="max" value="{{ max_pos }}">
+      </label>
+      <button type="submit">Generar número aleatorio</button>
+      <!-- mantenemos el número (pi o euler) -->
+      <input type="hidden" name="number" value="{{ number }}">
+    </form>
+
+    <hr>
+
+    <p>¿Cuál es el dígito número <strong>{{ position }}</strong> (después del punto)?</p>
+
+    <div class="row">
+      <input id="guess" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" placeholder="0–9">
+      <button type="button" onclick="checkDigit()">Comprobar</button>
+    </div>
+
+    <p id="result" class="result"></p>
+  </main>
+</body>
+</html>
