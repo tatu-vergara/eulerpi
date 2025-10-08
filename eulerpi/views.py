@@ -14,41 +14,39 @@ def index(request):
     return render(request, 'eulerpi/index.html')
 
 def game(request, number: str):
-    # para el juego usamos TODOS los decimales para validar;
-    # para la grilla de e mostramos solo los primeros 10.000
     digits_all = PI_DEC if number == "pi" else E_DEC
 
-    # rango solicitado
+    # rango de juego
     min_pos = int(request.GET.get("min", 1))
     max_pos = int(request.GET.get("max", len(digits_all)))
     if min_pos < 1: min_pos = 1
     if max_pos > len(digits_all): max_pos = len(digits_all)
     if min_pos > max_pos: min_pos, max_pos = max_pos, min_pos
 
-    # posición aleatoria dentro del rango
+    # posición aleatoria
     position = random.randint(min_pos, max_pos)
 
-    # grilla SOLO para e (10.000 dígitos, 100 columnas x 100 filas)
+    # grilla para e: 10.000 decimales => 100 filas x 100 columnas
     rows = []
     col_headers = list(range(1, 101))
     shown_len = 0
     if number == "euler":
-        dec = E_DEC[:10_000]
+        dec = E_DEC[:10_000]              # EXACTO 10.000
         shown_len = len(dec)
         for i in range(0, shown_len, 100):
-            start = i + 1                 # 1-index (primer decimal)
-            chunk = dec[i:i+100]          # string (hasta 100 chars)
+            start = i + 1
+            chunk = list(dec[i:i+100])    # <-- lista de caracteres (no string)
             end = start + len(chunk) - 1
-            rows.append((start, end, chunk))  # (inicio, fin, trozo)
+            rows.append({"start": start, "end": end, "chunk": chunk})
 
     return render(request, 'eulerpi/game.html', {
         "number": number,
-        "position": position,     # posición preguntada
+        "position": position,
         "min_pos": min_pos,
         "max_pos": max_pos,
-        "rows": rows,             # filas euler (si aplica)
+        "rows": rows,
         "col_headers": col_headers,
-        "shown_len": shown_len,   # largo de la grilla (<=10.000)
+        "shown_len": shown_len,
     })
 
 def check(request):
@@ -57,6 +55,5 @@ def check(request):
     guess = request.GET.get('guess', '')
 
     digits = PI_DEC if number == 'pi' else E_DEC
-    correct = digits[position - 1]  # 1-index → índice real - 1
-
+    correct = digits[position - 1]
     return JsonResponse({"correct": guess == correct, "expected": correct})

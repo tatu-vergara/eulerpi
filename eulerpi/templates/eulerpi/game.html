@@ -1,17 +1,21 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <title>Juego — {{ number }}</title>
   <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}" />
   <script>
-    // ---------- ZOOM ----------
+    // ==== ZOOM (sin calc en CSS) ====
     let zoom = parseFloat(localStorage.getItem('digitsZoom') || '1');
     const Z_MIN = 0.5, Z_MAX = 3, STEP = 1.15;
+    const BASE = { cell: 26, font: 14, gap: 2 };
 
     function applyZoom() {
-      document.documentElement.style.setProperty('--zoom', zoom.toFixed(3));
+      const root = document.documentElement;
+      root.style.setProperty('--cell', (BASE.cell * zoom) + 'px');
+      root.style.setProperty('--font', (BASE.font * zoom) + 'px');
+      root.style.setProperty('--gap',  (BASE.gap  * zoom) + 'px');
       const r = document.getElementById('zoomReadout');
       if (r) r.textContent = Math.round(zoom * 100) + '%';
     }
@@ -21,7 +25,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       applyZoom();
-      // atajos teclado: Ctrl/Cmd +, -, 0
       document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); zoomIn(); }
         if ((e.ctrlKey || e.metaKey) && (e.key === '-'))                  { e.preventDefault(); zoomOut(); }
@@ -29,7 +32,7 @@
       });
     });
 
-    // ---------- CHECK ----------
+    // ==== CHECK ====
     async function checkDigit() {
       const number = "{{ number }}";
       const position = "{{ position }}";
@@ -60,14 +63,9 @@
     <a href="{% url 'index' %}" class="link">← Volver</a>
     <h2>Estás jugando con {{ number|title }}</h2>
 
-    <!-- Rango -->
     <form method="get" class="range-form">
-      <label>Desde:
-        <input type="number" name="min" value="{{ min_pos }}" min="1" />
-      </label>
-      <label>Hasta:
-        <input type="number" name="max" value="{{ max_pos }}" />
-      </label>
+      <label>Desde: <input type="number" name="min" value="{{ min_pos }}" min="1"></label>
+      <label>Hasta: <input type="number" name="max" value="{{ max_pos }}"></label>
       <button type="submit">Generar número aleatorio</button>
       <input type="hidden" name="number" value="{{ number }}">
     </form>
@@ -85,48 +83,38 @@
 
     {% if number == 'euler' and rows %}
       <div class="zoom-controls">
-        <button type="button" class="zoom-btn" onclick="zoomOut()" aria-label="Reducir zoom">−</button>
+        <button type="button" class="zoom-btn" onclick="zoomOut()">−</button>
         <span id="zoomReadout" class="zoom-readout">100%</span>
-        <button type="button" class="zoom-btn" onclick="zoomIn()" aria-label="Ampliar zoom">+</button>
-        <button type="button" class="zoom-reset" onclick="zoomReset()" aria-label="Restablecer zoom">Reset</button>
+        <button type="button" class="zoom-btn" onclick="zoomIn()">+</button>
+        <button type="button" class="zoom-reset" onclick="zoomReset()">Reset</button>
       </div>
 
-      <h3 class="grid-title">Decimales de e (primeros {{ shown_len|default:0 }}): filas de 100</h3>
+      <h3 class="grid-title">Decimales de e (primeros {{ shown_len }}): filas de 100</h3>
 
       <div class="digits-viewport">
-        <!-- encabezado columnas 1..100 -->
-        <div class="grid-header">
-          <div class="row-label-head">posiciones</div>
-          {% for c in col_headers %}
-            <div class="cell head" data-col="{{ c }}">{{ c }}</div>
-          {% endfor %}
-        </div>
+        <div class="digits-inner">
+          <!-- Header 1..100 -->
+          <div class="grid-header">
+            <div class="row-label-head">posiciones</div>
+            {% for c in col_headers %}
+              <div class="cell head" data-col="{{ c }}">{{ c }}</div>
+            {% endfor %}
+          </div>
 
-        <!-- filas -->
-        <div class="grid-rows">
-          {% for item in rows %}
-            {% with start=item.0 end=item.1 chunk=item.2 %}
+          <!-- Filas -->
+          <div class="grid-rows">
+            {% for r in rows %}
               <div class="grid-row">
-                <div class="row-label sticky">{{ start }}–{{ end }}</div>
-                {% for ch in chunk %}
-                  {% with pos=start|add:forloop.counter0 col=forloop.counter %}
-                    <div
-                      class="cell digit{% if pos == position %} target{% endif %}"
-                      data-pos="{{ pos }}"
-                      data-col="{{ col }}"
-                      aria-label="posición {{ pos }}"
-                    >{{ ch }}</div>
+                <div class="row-label sticky">{{ r.start }}–{{ r.end }}</div>
+                {% for ch in r.chunk %}
+                  {% with pos=r.start|add:forloop.counter0 col=forloop.counter %}
+                    <div class="cell digit{% if pos == position %} target{% endif %}"
+                         data-pos="{{ pos }}" data-col="{{ col }}">{{ ch }}</div>
                   {% endwith %}
                 {% endfor %}
-                {# si la última fila no llega a 100, completamos celdas vacías para alinear #}
-                {% if chunk|length < 100 %}
-                  {% for _ in "x"|rjust:100|slice:":{{ 100|add:-chunk|length }}" %}
-                    <div class="cell filler"></div>
-                  {% endfor %}
-                {% endif %}
               </div>
-            {% endwith %}
-          {% endfor %}
+            {% endfor %}
+          </div>
         </div>
       </div>
     {% endif %}
