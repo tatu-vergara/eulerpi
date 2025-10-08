@@ -1,10 +1,38 @@
+/* =========================================================
+   EulerPi — CSS consolidado (layout + grilla con casillas)
+   ========================================================= */
+
+/* ---------- Variables (zoom y tamaños) ---------- */
+:root {
+  --zoom: 1;           /* se actualiza desde JS y persiste en localStorage */
+  --cell: 26px;        /* tamaño base de cada casilla (ancho/alto) */
+  --font: 14px;        /* tamaño base de fuente en casillas */
+  --gap: 2px;          /* separación entre casillas */
+}
+
+/* ---------- Base ---------- */
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: #f6f5f2;
   color: #222;
   padding: 2rem;
 }
-.wrapper { max-width: 560px; margin: 0 auto; text-align: center; }
+
+.wrapper {
+  max-width: 1100px;      /* amplio para la grilla; la portada igual se ve ok */
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #333;
+  text-decoration: none;
+}
+
+/* ---------- Botones & filas ---------- */
 .btn {
   display: inline-block;
   background: #00796b;
@@ -14,153 +42,174 @@ body {
   border-radius: 10px;
   margin: .4rem;
 }
-.link { display:inline-block; margin-bottom: 1rem; color:#333; text-decoration:none; }
-.row { display: flex; gap: .6rem; justify-content: center; margin-top: 1rem; }
-input[type="text"] { font-size: 1.2rem; width: 90px; text-align:center; padding:.5rem; }
-button { padding: .6rem 1rem; border-radius: 8px; border: 0; background:#1f6feb; color:#fff; cursor:pointer; }
-.result { margin-top: 1rem; font-size: 1.2rem; }
-.result.ok { color: #0a8f5b; }
-.result.ko { color: #c62828; }
-.note { margin-top: 1rem; color:#555; }
 
-.range-form {
-  margin: 1rem 0;
-  display: flex;
-  justify-content: center;
-  gap: .5rem;
-  flex-wrap: wrap;
-}
-.range-form input {
-  width: 100px;
-  padding: .3rem;
-  text-align: center;
-}
-.range-form button {
+button {
+  padding: .6rem 1rem;
+  border-radius: 8px;
+  border: 0;
   background: #1f6feb;
-  color: white;
-  border: none;
-  padding: .4rem .8rem;
-  border-radius: 6px;
+  color: #fff;
   cursor: pointer;
 }
 
-/* Layout base */
-.wrapper { max-width: 980px; margin: 0 auto; padding: 1rem; }
-.link { display:inline-block; margin-bottom:1rem; text-decoration:none; color:#333; }
-.row { display:flex; gap:.6rem; justify-content:center; margin:.8rem 0 1.2rem; }
-.result { margin-top:.6rem; font-size:1.1rem; }
-.result.ok { color:#0a8f5b; }
-.result.ko { color:#c62828; }
+.row {
+  display: flex;
+  gap: .6rem;
+  justify-content: center;
+  margin: .8rem 0 1.2rem;
+}
 
-/* Rango */
+input[type="text"] {
+  font-size: 1.2rem;
+  width: 90px;
+  text-align: center;
+  padding: .5rem;
+}
+
+.result { margin-top: .6rem; font-size: 1.1rem; }
+.result.ok { color: #0a8f5b; }
+.result.ko { color: #c62828; }
+
+/* ---------- Formulario de rango ---------- */
 .range-form {
   margin: .6rem 0 1rem;
-  display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; align-items:center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: center;
+  align-items: center;
 }
-.range-form input { width:120px; padding:.35rem; text-align:center; }
-.range-form button { padding:.45rem .9rem; border-radius:6px; border:0; background:#1f6feb; color:#fff; cursor:pointer; }
-
-/* Grid de dígitos */
-.grid-title { margin: 1.2rem 0 .6rem; text-align:center; }
-.digits-grid { display: grid; gap: 6px; }
-.digits-row { display: grid; grid-template-columns: 120px 1fr; align-items: start; gap: 8px; }
-.row-label {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color: #666; text-align: right; padding-right: 6px; white-space: nowrap;
-}
-.row-digits {
-  display: grid;
-  grid-template-columns: repeat(100, minmax(0, 1fr));
-  gap: 2px;
-}
-.digit {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 14px;
-  line-height: 1.6;
+.range-form input {
+  width: 120px;
+  padding: .35rem;
   text-align: center;
-  padding: 2px 0;
-  background: #fff;
-  border-radius: 3px;
-  border: 1px solid #eee;
+}
+.range-form button {
+  padding: .45rem .9rem;
+  border-radius: 6px;
+  border: 0;
+  background: #1f6feb;
+  color: #fff;
+  cursor: pointer;
 }
 
-/* La casilla de la posición actual (la pregunta) */
-.digit.target {
-  outline: 2px solid #1f6feb;
-  outline-offset: -2px;
-  background: #eef4ff;
-}
-
-/* Cuando aciertas, se ilumina */
-.digit.hit {
-  background: #c6f6d5; /* verde suave */
-  border-color: #9ae6b4;
-}
-
-/* ====== Zoom vars ====== */
-:root {
-  --zoom: 1;           /* se cambia desde JS */
-  --base-font: 14px;   /* tamaño font base para dígitos */
-  --cell: 22px;        /* ancho fijo por columna (antes del zoom) */
-  --gap: 2px;          /* separación entre celdas */
-}
-
+/* ---------- Controles de zoom ---------- */
 .zoom-controls {
-  display: flex; gap: .5rem; align-items: center; justify-content: center;
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: center;
   margin: .6rem 0 .4rem;
 }
-.zoom-btn, .zoom-reset {
-  padding: .35rem .6rem; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;
+.zoom-btn,
+.zoom-reset {
+  padding: .35rem .6rem;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
 }
 .zoom-readout { min-width: 3.5ch; text-align: center; color: #555; }
 
-/* Viewport con scroll para la grilla */
+/* ---------- Contenedor “viewport” con scroll ---------- */
 .digits-viewport {
-  max-height: 65vh;
+  max-height: 70vh;
   overflow: auto;
-  border: 1px solid #eee;
+  border: 1px solid #ececec;
   background: #fafafa;
   padding: 6px;
   border-radius: 8px;
 }
 
-/* Grilla y filas */
-.digits-grid { display: grid; gap: 6px; }
-.digits-row  { display: grid; grid-template-columns: 120px 1fr; align-items: start; gap: 8px; }
-.row-label   {
+.grid-title { text-align: center; margin: .6rem 0; }
+
+/* ---------- Encabezado (1..100) y filas de casillas ---------- */
+/* 1 columna fija para etiqueta + 100 columnas de casillas */
+.grid-header,
+.grid-row {
+  display: grid;
+  grid-template-columns: 120px repeat(100, calc(var(--cell) * var(--zoom)));
+  gap: calc(var(--gap) * var(--zoom));
+  align-items: center;
+}
+
+/* Encabezado superior pegajoso */
+.grid-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f3f3f3;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 4px;
+}
+
+.row-label-head,
+.row-label,
+.cell.head {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: calc(12px * var(--zoom));
-  color:#666; text-align: right; padding-right: 6px; white-space: nowrap;
+  color: #666;
 }
 
-/* 100 columnas con ancho escalable */
-.row-digits {
+.row-label-head {
+  text-align: right;
+  padding-right: 6px;
+}
+
+.grid-rows { display: grid; gap: 6px; }
+
+/* Etiqueta de fila pegajosa a la izquierda */
+.row-label.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: linear-gradient(to right, #fafafa, #fafafa);
+  border-right: 1px solid #eee;
+  text-align: right;
+  padding-right: 6px;
+  white-space: nowrap;
+}
+
+/* ---------- Casillas ---------- */
+.cell {
+  width: calc(var(--cell) * var(--zoom));
+  height: calc(var(--cell) * var(--zoom));
   display: grid;
-  grid-template-columns: repeat(100, calc(var(--cell) * var(--zoom)));
-  gap: calc(var(--gap) * var(--zoom));
-}
-
-/* Celda del dígito */
-.digit {
+  place-items: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: calc(var(--base-font) * var(--zoom));
-  line-height: 1.5;
-  text-align: center;
-  padding: calc(2px * var(--zoom)) 0;
+  font-size: calc(var(--font) * var(--zoom));
   background: #fff;
-  border-radius: 3px;
-  border: 1px solid #eee;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
 }
 
-/* Posición de la pregunta (marcada en azul) */
+.cell.head { background: #f3f3f3; border-color: #e0e0e0; }
+
+/* separadores verticales cada 10 columnas usando data-col */
+.cell[data-col="10"],
+.cell[data-col="20"],
+.cell[data-col="30"],
+.cell[data-col="40"],
+.cell[data-col="50"],
+.cell[data-col="60"],
+.cell[data-col="70"],
+.cell[data-col="80"],
+.cell[data-col="90"],
+.cell[data-col="100"] {
+  border-right: 2px solid #cfcfcf;
+}
+
+/* dígito “normal”, “preguntado” y “acertado” */
+.digit { background: #fff; }
 .digit.target {
   outline: 2px solid #1f6feb;
   outline-offset: -2px;
   background: #eef4ff;
 }
-
-/* Acierto (verde) */
 .digit.hit {
-  background: #c6f6d5; /* verde suave */
+  background: #c6f6d5;     /* verde suave */
   border-color: #9ae6b4;
 }
+
+/* Celdas de relleno (si la última fila no llega a 100) */
+.cell.filler { background: #f3f3f3; border-style: dashed; }
