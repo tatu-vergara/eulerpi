@@ -2,10 +2,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Juego — {{ number }}</title>
-  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}">
+  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}" />
   <script>
+    // --- ZOOM ---
+    let zoom = parseFloat(localStorage.getItem('digitsZoom') || '1');
+    const Z_MIN = 0.5, Z_MAX = 3, STEP = 1.15;
+
+    function applyZoom() {
+      document.documentElement.style.setProperty('--zoom', zoom.toFixed(3));
+      const r = document.getElementById('zoomReadout');
+      if (r) r.textContent = Math.round(zoom * 100) + '%';
+    }
+    function zoomIn()  { zoom = Math.min(Z_MAX, +(zoom * STEP).toFixed(3)); localStorage.setItem('digitsZoom', zoom); applyZoom(); }
+    function zoomOut() { zoom = Math.max(Z_MIN, +(zoom / STEP).toFixed(3)); localStorage.setItem('digitsZoom', zoom); applyZoom(); }
+    function zoomReset(){ zoom = 1; localStorage.setItem('digitsZoom', zoom); applyZoom(); }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyZoom();
+      // Atajos: Ctrl/Cmd +, -, 0
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); zoomIn(); }
+        if ((e.ctrlKey || e.metaKey) && (e.key === '-'))                  { e.preventDefault(); zoomOut(); }
+        if ((e.ctrlKey || e.metaKey) && (e.key === '0'))                  { e.preventDefault(); zoomReset(); }
+      });
+    });
+
+    // --- CHECK ---
     async function checkDigit() {
       const number = "{{ number }}";
       const position = "{{ position }}";
@@ -15,9 +39,17 @@
       const data = await res.json();
 
       const resultBox = document.getElementById("result");
+      const target = document.querySelector(`[data-pos="${position}"]`);
+
       if (data.correct) {
         resultBox.textContent = "✅ Correcto!";
         resultBox.className = "result ok";
+        if (target) {
+          target.classList.add("hit");
+          // Si hay viewport con scroll, centramos ahí:
+          const vp = document.querySelector('.digits-viewport') || document.scrollingElement;
+          target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
       } else {
         resultBox.textContent = `❌ Incorrecto (era ${data.expected})`;
         resultBox.className = "result ko";
@@ -30,29 +62,58 @@
     <a href="{% url 'index' %}" class="link">← Volver</a>
     <h2>Estás jugando con {{ number|title }}</h2>
 
-    <!-- NUEVO: selector de rango -->
+    <!-- Selector de rango -->
     <form method="get" class="range-form">
       <label>Desde:
-        <input type="number" name="min" value="{{ min_pos }}" min="1">
+        <input type="number" name="min" value="{{ min_pos }}" min="1" />
       </label>
       <label>Hasta:
-        <input type="number" name="max" value="{{ max_pos }}">
+        <input type="number" name="max" value="{{ max_pos }}" />
       </label>
       <button type="submit">Generar número aleatorio</button>
-      <!-- mantenemos el número (pi o euler) -->
       <input type="hidden" name="number" value="{{ number }}">
     </form>
 
-    <hr>
+    <hr />
 
-    <p>¿Cuál es el dígito número <strong>{{ position }}</strong> (después del punto)?</p>
+    <p>¿Cuál es el dígito número <strong>{{ position }}</strong></p>
 
     <div class="row">
-      <input id="guess" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" placeholder="0–9">
+      <input id="guess" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" placeholder="0–9" />
       <button type="button" onclick="checkDigit()">Comprobar</button>
     </div>
 
     <p id="result" class="result"></p>
+
+    {% if number == 'euler' and rows %}
+      <div class="zoom-controls">
+        <button type="button" class="zoom-btn" onclick="zoomOut()" aria-label="Reducir zoom">−</button>
+        <span id="zoomReadout" class="zoom-readout">100%</span>
+        <button type="button" class="zoom-btn" onclick="zoomIn()" aria-label="Ampliar zoom">+</button>
+        <button type="button" class="zoom-reset" onclick="zoomReset()" aria-label="Restablecer zoom">Reset</button>
+      </div>
+
+      <h3 class="grid-title">Decimales de e (primeros 100.000)</h3>
+
+      <div class="digits-viewport">
+        <div class="digits-grid">
+          {% for item in rows %}
+            {% with start=item.0 end=item.1 chunk=item.2 %}
+              <div class="digits-row" data-start="{{ start }}">
+                <div class="row-label">{{ start }}–{{ end }}</div>
+                <div class="row-digits">
+                  {% for ch in chunk %}
+                    {% with pos=start|add:forloop.counter0 %}
+                      <span class="digit{% if pos == position %} target{% endif %}" data-pos="{{ pos }}">{{ ch }}</span>
+                    {% endwith %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
   </main>
 </body>
 </html>

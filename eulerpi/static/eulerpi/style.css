@@ -43,3 +43,124 @@ button { padding: .6rem 1rem; border-radius: 8px; border: 0; background:#1f6feb;
   border-radius: 6px;
   cursor: pointer;
 }
+
+/* Layout base */
+.wrapper { max-width: 980px; margin: 0 auto; padding: 1rem; }
+.link { display:inline-block; margin-bottom:1rem; text-decoration:none; color:#333; }
+.row { display:flex; gap:.6rem; justify-content:center; margin:.8rem 0 1.2rem; }
+.result { margin-top:.6rem; font-size:1.1rem; }
+.result.ok { color:#0a8f5b; }
+.result.ko { color:#c62828; }
+
+/* Rango */
+.range-form {
+  margin: .6rem 0 1rem;
+  display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; align-items:center;
+}
+.range-form input { width:120px; padding:.35rem; text-align:center; }
+.range-form button { padding:.45rem .9rem; border-radius:6px; border:0; background:#1f6feb; color:#fff; cursor:pointer; }
+
+/* Grid de dígitos */
+.grid-title { margin: 1.2rem 0 .6rem; text-align:center; }
+.digits-grid { display: grid; gap: 6px; }
+.digits-row { display: grid; grid-template-columns: 120px 1fr; align-items: start; gap: 8px; }
+.row-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #666; text-align: right; padding-right: 6px; white-space: nowrap;
+}
+.row-digits {
+  display: grid;
+  grid-template-columns: repeat(100, minmax(0, 1fr));
+  gap: 2px;
+}
+.digit {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+  padding: 2px 0;
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #eee;
+}
+
+/* La casilla de la posición actual (la pregunta) */
+.digit.target {
+  outline: 2px solid #1f6feb;
+  outline-offset: -2px;
+  background: #eef4ff;
+}
+
+/* Cuando aciertas, se ilumina */
+.digit.hit {
+  background: #c6f6d5; /* verde suave */
+  border-color: #9ae6b4;
+}
+
+/* ====== Zoom vars ====== */
+:root {
+  --zoom: 1;           /* se cambia desde JS */
+  --base-font: 14px;   /* tamaño font base para dígitos */
+  --cell: 22px;        /* ancho fijo por columna (antes del zoom) */
+  --gap: 2px;          /* separación entre celdas */
+}
+
+.zoom-controls {
+  display: flex; gap: .5rem; align-items: center; justify-content: center;
+  margin: .6rem 0 .4rem;
+}
+.zoom-btn, .zoom-reset {
+  padding: .35rem .6rem; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;
+}
+.zoom-readout { min-width: 3.5ch; text-align: center; color: #555; }
+
+/* Viewport con scroll para la grilla */
+.digits-viewport {
+  max-height: 65vh;
+  overflow: auto;
+  border: 1px solid #eee;
+  background: #fafafa;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+/* Grilla y filas */
+.digits-grid { display: grid; gap: 6px; }
+.digits-row  { display: grid; grid-template-columns: 120px 1fr; align-items: start; gap: 8px; }
+.row-label   {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(12px * var(--zoom));
+  color:#666; text-align: right; padding-right: 6px; white-space: nowrap;
+}
+
+/* 100 columnas con ancho escalable */
+.row-digits {
+  display: grid;
+  grid-template-columns: repeat(100, calc(var(--cell) * var(--zoom)));
+  gap: calc(var(--gap) * var(--zoom));
+}
+
+/* Celda del dígito */
+.digit {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(var(--base-font) * var(--zoom));
+  line-height: 1.5;
+  text-align: center;
+  padding: calc(2px * var(--zoom)) 0;
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #eee;
+}
+
+/* Posición de la pregunta (marcada en azul) */
+.digit.target {
+  outline: 2px solid #1f6feb;
+  outline-offset: -2px;
+  background: #eef4ff;
+}
+
+/* Acierto (verde) */
+.digit.hit {
+  background: #c6f6d5; /* verde suave */
+  border-color: #9ae6b4;
+}
