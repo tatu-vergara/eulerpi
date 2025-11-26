@@ -7,7 +7,7 @@ Demo en línea (Render):
 
 ---
 
-## 🚀 Funcionalidades principales
+## Funcionalidades principales
 
 - Generación dinámica de secuencias numéricas (Pi, Euler y más).
 - Interfaz simple e intuitiva para usuarios nuevos.
@@ -17,7 +17,7 @@ Demo en línea (Render):
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## Tecnologías utilizadas
 
 ### **Backend**
 - **Python 3**
@@ -39,7 +39,7 @@ Demo en línea (Render):
 
 ---
 
-## 📦 Instalación y uso
+## Instalación y uso
 
 ### 1. Clonar el repositorio
 
@@ -64,7 +64,7 @@ python manage.py runserver
 La aplicación estará disponible en:
 http://127.0.0.1:8000/
 
-🌐 Deploy en Render
+## Deploy en Render
 
 Este proyecto está desplegado en Render.com utilizando:
 
@@ -93,7 +93,7 @@ eulerpi/
 │── manage.py
 │── requirements.txt
 
-📄 Licencia
+### Licencia
 
 Este proyecto está disponible bajo la licencia MIT.
 Puedes usarlo, modificarlo o adaptarlo mencionando la autoría.
