@@ -1,9 +1,9 @@
 """
 Django settings for core project.
 """
-
-from pathlib import Path
 import os  # ✅ mover aquí la importación, antes de usarla
+from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,12 +13,25 @@ SECRET_KEY = 'django-insecure-^)$u&r@(1&8diel@x18kio1ps&@d-@8-b*zn-ixa3pc=-qpeb5
 
 # ✅ Ajuste de DEBUG y ALLOWED_HOSTS
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+if DEBUG:
+    WHITENOISE_USE_FINDERS = True
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+else:
+    # En producción: archivos comprimidos + con hash
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
+
 ALLOWED_HOSTS = ['*']
 
 # ✅ Archivos estáticos
 STATIC_URL = '/static/'  # importante que empiece y termine con "/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # ✅
+# STATICFILES_DIRS = [BASE_DIR / 'static']  # si tienes una carpeta 'static' en el proyecto
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,6 +54,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'core.urls'
 

@@ -4,20 +4,21 @@
 <head>
   <meta charset="utf-8" />
   <title>Juego — {{ number }}</title>
-  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}" />
+  <link rel="stylesheet" href="/static/eulerpi/grid.css?v=routeOK">
+
   <script>
-    // ==== ZOOM (sin calc en CSS) ====
+    // === ZOOM simple (JS modifica vars CSS) ===
     let zoom = parseFloat(localStorage.getItem('digitsZoom') || '1');
     const Z_MIN = 0.5, Z_MAX = 3, STEP = 1.15;
     const BASE = { cell: 26, font: 14, gap: 2 };
 
     function applyZoom() {
-      const root = document.documentElement;
-      root.style.setProperty('--cell', (BASE.cell * zoom) + 'px');
-      root.style.setProperty('--font', (BASE.font * zoom) + 'px');
-      root.style.setProperty('--gap',  (BASE.gap  * zoom) + 'px');
-      const r = document.getElementById('zoomReadout');
-      if (r) r.textContent = Math.round(zoom * 100) + '%';
+      const r = document.documentElement;
+      r.style.setProperty('--cell', (BASE.cell * zoom) + 'px');
+      r.style.setProperty('--font', (BASE.font * zoom) + 'px');
+      r.style.setProperty('--gap',  (BASE.gap  * zoom) + 'px');
+      const t = document.getElementById('zoomReadout');
+      if (t) t.textContent = Math.round(zoom * 100) + '%';
     }
     function zoomIn()   { zoom = Math.min(Z_MAX, +(zoom * STEP).toFixed(3)); localStorage.setItem('digitsZoom', zoom); applyZoom(); }
     function zoomOut()  { zoom = Math.max(Z_MIN, +(zoom / STEP).toFixed(3)); localStorage.setItem('digitsZoom', zoom); applyZoom(); }
@@ -32,7 +33,7 @@
       });
     });
 
-    // ==== CHECK ====
+    // === CHECK ===
     async function checkDigit() {
       const number = "{{ number }}";
       const position = "{{ position }}";
@@ -57,6 +58,7 @@
       }
     }
   </script>
+  
 </head>
 <body>
   <main class="wrapper">
@@ -72,7 +74,7 @@
 
     <hr />
 
-    <p>¿Cuál es el dígito número <strong>{{ position }}</strong></p>
+    <p>¿Cuál es el dígito número <strong>{{ position }}</strong> </p>
 
     <div class="row">
       <input id="guess" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" placeholder="0–9" />
@@ -93,7 +95,7 @@
 
       <div class="digits-viewport">
         <div class="digits-inner">
-          <!-- Header 1..100 -->
+          <!-- Encabezado 1..100 -->
           <div class="grid-header">
             <div class="row-label-head">posiciones</div>
             {% for c in col_headers %}
@@ -101,7 +103,7 @@
             {% endfor %}
           </div>
 
-          <!-- Filas -->
+          <!-- Filas (100 columnas) -->
           <div class="grid-rows">
             {% for r in rows %}
               <div class="grid-row">

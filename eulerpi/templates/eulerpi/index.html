@@ -1,20 +1,20 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>EulerPi Trainer</title>
-  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}">
+  <meta charset="utf-8" />
+  <title>EulerPi</title>
+  <link rel="stylesheet" href="{% static 'eulerpi/style.css' %}?v=base2">
+  <link rel="stylesheet" href="{% static 'eulerpi/grid.css' %}?v=grid4">
 </head>
 <body>
   <main class="wrapper">
-    <h1>EulerPi Trainer</h1>
-    <p>Elige con qué número quieres jugar:</p>
-    <nav>
-      <a href="{% url 'game' 'pi' %}" class="btn">Jugar con π</a>
-      <a href="{% url 'game' 'euler' %}" class="btn">Jugar con e</a>
-    </nav>
-    <p class="note">Contamos posiciones <strong>después del punto decimal</strong>.</p>
+    <h1>EulerPi</h1>
+    <p>Elige un número para jugar:</p>
+    <div class="row">
+      <a class="btn" href="{% url 'game' 'euler' %}">Euler</a>
+      <a class="btn" href="{% url 'game' 'pi' %}">Pi</a>
+    </div>
   </main>
 </body>
 </html>

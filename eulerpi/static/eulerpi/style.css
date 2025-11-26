@@ -1,15 +1,11 @@
-/* =========================
-   EulerPi — CSS limpio
-   ========================= */
+/* ===== EulerPi — CSS para grilla con casillas ===== */
 
-/* Vars controladas por JS (zoom) */
+/* Vars (se ajustan con JS para el zoom) */
 :root { --cell: 26px; --font: 14px; --gap: 2px; }
 
-body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #f6f5f2; color: #222; padding: 2rem;
-}
-.wrapper { max-width: 1100px; margin: 0 auto; padding: 1rem; text-align: center; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+background:#f0e9d1; color:#222; padding:2rem; }
+.wrapper { max-width:1100px; margin:0 auto; padding:1rem; text-align:center; }
 
 .link { display:inline-block; margin-bottom:1rem; color:#333; text-decoration:none; }
 .btn { display:inline-block; background:#00796b; color:#fff; text-decoration:none; padding:.75rem 1.1rem; border-radius:10px; margin:.4rem; }
@@ -20,45 +16,38 @@ input[type="text"] { font-size:1.2rem; width:90px; text-align:center; padding:.5
 .result { margin-top:.6rem; font-size:1.1rem; }
 .result.ok { color:#0a8f5b; } .result.ko { color:#c62828; }
 
-/* Rango */
 .range-form { margin:.6rem 0 1rem; display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; align-items:center; }
 .range-form input { width:120px; padding:.35rem; text-align:center; }
 .range-form button { padding:.45rem .9rem; border-radius:6px; border:0; background:#1f6feb; color:#fff; cursor:pointer; }
 
-/* Zoom */
 .zoom-controls { display:flex; gap:.5rem; align-items:center; justify-content:center; margin:.6rem 0 .4rem; }
 .zoom-btn, .zoom-reset { padding:.35rem .6rem; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; }
 .zoom-readout { min-width:3.5ch; text-align:center; color:#555; }
 
 .grid-title { text-align:center; margin:.6rem 0; }
 
-/* Viewport con scroll */
 .digits-viewport { max-height:70vh; overflow:auto; border:1px solid #ececec; background:#fafafa; padding:6px; border-radius:8px; }
+.digits-inner   { width:max-content; }     /* fuerza ancho propio y scroll horizontal si no cabe */
 
-/* Fuerza ancho intrínseco para que haya scroll horizontal si no cabe */
-.digits-inner { width:max-content; }
-
-/* Header y filas: etiqueta + 100 casillas fijas */
+/* Etiqueta + 100 casillas fijas */
 .grid-header,
 .grid-row {
   display:grid;
   grid-template-columns: 120px repeat(100, var(--cell));
   gap: var(--gap);
   align-items:center;
-  width:max-content;        /* clave para evitar colapsar a una sola columna */
+  width:max-content;                     /* clave: no colapsa y mantiene 101 columnas */
 }
 
 /* Header pegajoso */
-.grid-header {
-  position: sticky; top: 0; z-index: 2;
-  background:#f3f3f3; border-bottom:1px solid #e5e5e5; padding-bottom:4px;
-}
+.grid-header { position:sticky; top:0; z-index:2; background:#f3f3f3; border-bottom:1px solid #e5e5e5; padding-bottom:4px; }
 
 .row-label-head,
 .row-label,
 .cell.head {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: var(--font); color:#666;
+  font-size: var(--font);
+  color:#666;
 }
 
 .row-label-head { text-align:right; padding-right:6px; }
@@ -80,18 +69,14 @@ input[type="text"] { font-size:1.2rem; width:90px; text-align:center; padding:.5
   font-size: var(--font);
   background:#fff; border:1px solid #e6e6e6; border-radius:4px;
 }
-
 .cell.head { background:#f3f3f3; border-color:#e0e0e0; }
 
-/* separadores cada 10 columnas */
+/* Separadores verticales cada 10 columnas */
 .cell[data-col="10"], .cell[data-col="20"], .cell[data-col="30"],
 .cell[data-col="40"], .cell[data-col="50"], .cell[data-col="60"],
 .cell[data-col="70"], .cell[data-col="80"], .cell[data-col="90"],
 .cell[data-col="100"] { border-right:2px solid #cfcfcf; }
 
-/* estados */
+/* Estados */
 .digit.target { outline:2px solid #1f6feb; outline-offset:-2px; background:#eef4ff; }
 .digit.hit    { background:#c6f6d5; border-color:#9ae6b4; }
-
-/* última fila incompleta (no aplica con 10.000 justo) */
-.cell.filler { background:#f3f3f3; border-style:dashed; }
